@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">GalleryDemoKarimNabil</string>
+    
+    <!-- Start Bottom Navigation Bar items -->
+
+    <string name="images_label">Images</string>
+    <string name="videos_label">Videos</string>
+
+    <!-- End Bottom Navigation Bar items -->
 </resources>
