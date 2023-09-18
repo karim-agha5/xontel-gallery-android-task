@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">GalleryDemoKarimNabil</string>
-    
+
     <!-- Start Bottom Navigation Bar items -->
 
     <string name="images_label">Images</string>
     <string name="videos_label">Videos</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- End Bottom Navigation Bar items -->
 </resources>
