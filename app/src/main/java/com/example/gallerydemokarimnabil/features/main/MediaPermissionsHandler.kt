@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.gallerydemokarimnabil.features.core.customexceptions.ReadExternalStoragePermissionException
+import com.example.gallerydemokarimnabil.features.core.customexceptions.WriteExternalStoragePermissionException
 
 class MediaPermissionsHandler private constructor(private val builder: Builder) {
 
@@ -44,7 +46,7 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         if(readExternalStorage != null){
             return ActivityCompat.shouldShowRequestPermissionRationale(activity,readExternalStorage)
         }
-        return false // TODO throw custom ReadExternalStoragePermissionException
+        throw ReadExternalStoragePermissionException()
     }
 
     fun isReadExternalStoragePermissionGranted() : Boolean{
@@ -54,7 +56,7 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
                 readExternalStorage
             ) == PackageManager.PERMISSION_GRANTED
         }
-        return false // TODO throw custom ReadExternalStoragePermissionException
+        throw ReadExternalStoragePermissionException()
     }
 
     fun isWriteExternalStoragePermissionGranted() : Boolean{
@@ -64,7 +66,7 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
                 writeExternalStorage
             ) == PackageManager.PERMISSION_GRANTED
         }
-        return false // TODO throw custom WriteExternalStoragePermissionException
+        throw WriteExternalStoragePermissionException()
     }
 
     // Get the application instance instead of context to make sure you receive an application's context
