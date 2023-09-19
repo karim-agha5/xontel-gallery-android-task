@@ -9,4 +9,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- End Bottom Navigation Bar items -->
+
+    <!-- Start Snackbars messages and buttons -->
+
+    <string name="permanent_snackbar_message">Permission is required to get the media</string>
+    <string name="permanent_snackbar_button_label">Enable</string>
+
+    <!-- End Snackbars messages and buttons -->
 </resources>
