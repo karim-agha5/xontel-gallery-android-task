@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/images"
+        android:enabled="true"
+        android:icon="@drawable/baseline_image_24"
+        android:title="@string/images_label"/>
+
+    <item
+        android:id="@+id/videos"
+        android:enabled="true"
+        android:icon="@drawable/baseline_video_library_24"
+        android:title="@string/videos_label"/>
+
+</menu>
