@@ -42,9 +42,9 @@ class MainActivity : AppCompatActivity() {
         initNavController()
         setBottomNavViewItemsClickListeners()
 
-        imagesLiveData.observe(this){
+        /*imagesLiveData.observe(this){
             Log.i("MainActivity", "list's size -> ${it.size}")
-        }
+        }*/
 
         // Register the permission result callback
         val requestPermissionLauncher = onPermissionResult()
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         if(permissionsHandler.isReadExternalStoragePermissionGranted()){
             setScreenViewsToVisible()
-            loadImages()
+            //loadImages()
         }
         else{
             permissionsHandler.requestPermissions()
