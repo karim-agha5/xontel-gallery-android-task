@@ -1,4 +1,4 @@
-package com.example.gallerydemokarimnabil.features.images
+package com.example.gallerydemokarimnabil.features.images.helpers
 
 import android.app.Application
 import android.content.ContentUris

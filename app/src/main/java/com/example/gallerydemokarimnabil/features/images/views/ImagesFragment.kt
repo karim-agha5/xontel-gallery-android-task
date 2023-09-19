@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.databinding.FragmentImagesBinding
-import com.example.gallerydemokarimnabil.features.images.MediaStoreImageUriFetcher
+import com.example.gallerydemokarimnabil.features.images.helpers.MediaStoreImageUriFetcher
 import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMapperImpl
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory

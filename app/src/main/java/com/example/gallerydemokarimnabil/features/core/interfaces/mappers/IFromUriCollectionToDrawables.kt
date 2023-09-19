@@ -4,5 +4,5 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 
 interface IFromUriCollectionToDrawables {
-    fun fromUrisToDrawables(listOfUris: List<Uri>) : List<Drawable?>
+    suspend fun fromUrisToDrawables(listOfUris: List<Uri>) : List<Drawable?>
 }

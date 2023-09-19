@@ -31,12 +31,8 @@ class ImagesViewModel(
     }
 
     private suspend fun loadImagesFromInternalStorage(){
-        var images: List<Drawable?>
-
-        withContext(Dispatchers.IO){
-            val urisList = imageUriFetcher.fetchImageUris()
-            images = uriCollectionToDrawablesMapper.fromUrisToDrawables(urisList)
-        }
+        val urisList = imageUriFetcher.fetchImageUris()
+        val images = uriCollectionToDrawablesMapper.fromUrisToDrawables(urisList)
 
         _imagesState.value = images
     }
