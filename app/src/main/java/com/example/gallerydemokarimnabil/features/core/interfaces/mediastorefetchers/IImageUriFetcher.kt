@@ -2,6 +2,6 @@ package com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefet
 
 import android.net.Uri
 
-interface ImageUriFetcher {
+interface IImageUriFetcher {
     fun fetchImageUris() : List<Uri>
 }

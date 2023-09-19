@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriCollectionToDrawables
-import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.ImageUriFetcher
+import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.IImageUriFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 
 // TODO inject the class responsible for loading the images' Uris and the mapper
 class ImagesViewModel(
-    private val imageUriFetcher: ImageUriFetcher,
+    private val imageUriFetcher: IImageUriFetcher,
     private val uriCollectionToDrawablesMapper: IFromUriCollectionToDrawables
     ) : ViewModel() {
 

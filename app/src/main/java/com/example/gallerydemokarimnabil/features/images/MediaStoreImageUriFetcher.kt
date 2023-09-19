@@ -4,9 +4,9 @@ import android.app.Application
 import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
-import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.ImageUriFetcher
+import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.IImageUriFetcher
 
-class MediaStoreImageUriFetcher(private val application: Application) : ImageUriFetcher {
+class MediaStoreImageUriFetcher(private val application: Application) : IImageUriFetcher {
 
     override fun fetchImageUris(): List<Uri> {
         val urisList = mutableListOf<Uri>()
