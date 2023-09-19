@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
@@ -77,18 +78,43 @@ class MainActivity : AppCompatActivity() {
                 R.id.images -> {
                     // If it's currently selected. Don't navigate again.
                     if(binding.bnvGlobal.selectedItemId != it.itemId){
-                        navController.navigate(NavGraphDirections.actionGlobalImagesFragment())
+                        navigateToImages()
                     }
                     true
                 }
 
                 R.id.videos -> {
-                    navController.navigate(NavGraphDirections.actionGlobalVideosFragment())
+                    // If it's currently selected. Don't navigate again.
+                    if(binding.bnvGlobal.selectedItemId != it.itemId){
+                        navigateToVideos()
+                    }
                     true
                 }
                 else -> {/*Do Nothing*/ true}
             }
         }
+    }
+
+    private fun navigateToImages(){
+        navController.navigate(
+            NavGraphDirections.actionGlobalImagesFragment(),
+            navOptions {
+                popUpTo(R.id.nav_graph){
+                    inclusive = true
+                }
+            }
+        )
+    }
+
+    private fun navigateToVideos(){
+        navController.navigate(
+            NavGraphDirections.actionGlobalVideosFragment(),
+            navOptions {
+                popUpTo(R.id.images){
+                    inclusive = false
+                }
+            }
+        )
     }
 
     private fun setScreenViewsToGone(){
