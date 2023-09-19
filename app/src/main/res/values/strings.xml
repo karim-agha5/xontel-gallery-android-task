@@ -14,6 +14,7 @@
 
     <string name="permanent_snackbar_message">Permission is required to get the media</string>
     <string name="permanent_snackbar_button_label">Enable</string>
+    <string name="image_desc">Gallery Image</string>
 
     <!-- End Snackbars messages and buttons -->
 </resources>
