@@ -56,9 +56,13 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
         super.onViewCreated(view, savedInstanceState)
 
         if(permissionsHandler.isReadExternalStoragePermissionGranted()){
-            lifecycleScope.launch {
-                imagesViewModel.imagesState.collect{
-                    setUiState(it)
+            // If config. changes
+            if(imagesViewModel.imagesState.value.isNotEmpty()){
+                initRecyclerView(imagesViewModel.imagesState.value)
+            }
+            else{
+                lifecycleScope.launch {
+                    imagesViewModel.imagesState.collect{ setUiState(it) }
                 }
             }
         }

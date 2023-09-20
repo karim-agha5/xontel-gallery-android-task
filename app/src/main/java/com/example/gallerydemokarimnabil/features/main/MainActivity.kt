@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private lateinit var navHostFragment: NavHostFragment
     private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
@@ -41,9 +42,11 @@ class MainActivity : AppCompatActivity() {
         setScreenViewsToGone()
        // imagesLiveData = MutableLiveData()
 
-        initNavController()
+        initNavComponents()
         setBottomNavViewItemsClickListeners()
-        val galleryStartDestination = findStartDestination() as GalleryStartDestination
+
+        val galleryStartDestination =
+            navHostFragment.childFragmentManager.fragments[0] as GalleryStartDestination
 
         /*imagesLiveData.observe(this){
             Log.i("MainActivity", "list's size -> ${it.size}")
@@ -70,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initNavController(){
-        val navHostFragment =
+    private fun initNavComponents(){
+         navHostFragment =
             supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
         navController = navHostFragment.findNavController()
     }
