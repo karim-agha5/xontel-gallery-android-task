@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.gallerydemokarimnabil.core.customexceptions.ActivityResultLauncherMissingException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.ReadExternalStoragePermissionException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.WriteExternalStoragePermissionException
 
@@ -16,10 +17,11 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
     private var _context: Context? = null
     private var context: Context
 
-    private var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private var requestPermissionLauncher: ActivityResultLauncher<Array<String>>?
 
     private val readExternalStorage: String?
     private val writeExternalStorage: String?
+    private val onPermissionsGranted: (() -> Unit)?
 
     private var permissionsList = mutableListOf<String>()
 
@@ -33,13 +35,17 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         context = _context!!
         readExternalStorage = builder.readExternalStorage
         writeExternalStorage = builder.writeExternalStorage
+        onPermissionsGranted = builder.onPermissionsGranted
         requestPermissionLauncher = builder.requestPermissionLauncher
         permissionsList = builder.permissionsList
     }
 
 
     fun requestPermissions(){
-        requestPermissionLauncher.launch(permissionsList.toTypedArray())
+        if(requestPermissionLauncher == null) {
+            throw ActivityResultLauncherMissingException()
+        }
+        requestPermissionLauncher?.launch(permissionsList.toTypedArray())
     }
 
     fun shouldShowRationaleForReadExternalStorage(activity: Activity) : Boolean{
@@ -48,6 +54,8 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         }
         throw ReadExternalStoragePermissionException()
     }
+
+    fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
 
     fun isReadExternalStoragePermissionGranted() : Boolean{
         if(readExternalStorage != null){
@@ -79,7 +87,10 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         var writeExternalStorage: String? = null
             private set
 
-        lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+        var requestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+            private set
+
+        var onPermissionsGranted: (() -> Unit)? = null
             private set
 
         var permissionsList = mutableListOf<String>()
@@ -111,6 +122,15 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
          * */
         fun activityResultLauncher(requestPermissionLauncher: ActivityResultLauncher<Array<String>>) = apply {
             this.requestPermissionLauncher = requestPermissionLauncher
+        }
+
+        /**
+         * Initializes [MediaPermissionsHandler.onPermissionsGranted]
+         * Executes a function once a permission(s) is granted.
+         * @return [Builder]
+         * */
+        fun onPermissionsGranted(func: (() -> Unit)?) = apply{
+            this.onPermissionsGranted = func
         }
 
         /**

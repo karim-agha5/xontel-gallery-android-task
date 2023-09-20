@@ -10,6 +10,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -18,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
+import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -37,10 +39,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setScreenViewsToGone()
-        imagesLiveData = MutableLiveData()
+       // imagesLiveData = MutableLiveData()
 
         initNavController()
         setBottomNavViewItemsClickListeners()
+        val galleryStartDestination = findStartDestination() as GalleryStartDestination
 
         /*imagesLiveData.observe(this){
             Log.i("MainActivity", "list's size -> ${it.size}")
@@ -54,6 +57,7 @@ class MainActivity : AppCompatActivity() {
                 .Builder(application)
                 .readExternalStorage()
                 .writeExternalStorage()
+                .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
                 .activityResultLauncher(requestPermissionLauncher)
                 .build()
 
@@ -70,6 +74,15 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
         navController = navHostFragment.findNavController()
+    }
+
+    /*
+    * The current visible fragment has to be the start destination.
+    * */
+    private fun findStartDestination() : Fragment?{
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
+        return navHostFragment.childFragmentManager.getFragments().get(0)
     }
 
     private fun setBottomNavViewItemsClickListeners(){
@@ -148,16 +161,13 @@ class MainActivity : AppCompatActivity() {
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
             if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
                 setScreenViewsToVisible()
-                loadImages()
+                permissionsHandler.invokeOnPermissionsGrantedIfProvided()
+                //loadImages()
             }
             if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == false){
                 if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
                     setScreenViewsToGone()
                     showPermissionRationale()
-                }
-                else{
-                    setBottomNavViewVisibilityToGone()
-                    // TODO delegate this functionality to the currently attached fragment to show an error textview
                 }
             }
         }
