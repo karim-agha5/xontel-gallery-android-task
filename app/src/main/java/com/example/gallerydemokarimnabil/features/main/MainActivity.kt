@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -21,6 +22,8 @@ import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
+import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel
+import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -33,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
+    private val mainActivityViewModel: MainActivityViewModel by viewModels{
+        MainActivityViewModelFactory(navHostFragment)
+    }
+    private lateinit var galleryStartDestination: GalleryStartDestination
     private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
@@ -43,10 +50,11 @@ class MainActivity : AppCompatActivity() {
        // imagesLiveData = MutableLiveData()
 
         initNavComponents()
+        setAppStartDestination()
         setBottomNavViewItemsClickListeners()
 
-        val galleryStartDestination =
-            navHostFragment.childFragmentManager.fragments[0] as GalleryStartDestination
+
+
 
         /*imagesLiveData.observe(this){
             Log.i("MainActivity", "list's size -> ${it.size}")
@@ -77,6 +85,18 @@ class MainActivity : AppCompatActivity() {
          navHostFragment =
             supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
         navController = navHostFragment.findNavController()
+    }
+
+    private fun setAppStartDestination(){
+        if(mainActivityViewModel.appStartDestination.value != null){
+            galleryStartDestination =
+                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
+        }
+        else{
+            mainActivityViewModel.setAppStartDestination(navHostFragment)
+            galleryStartDestination =
+                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
+        }
     }
 
     /*
