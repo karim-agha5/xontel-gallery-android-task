@@ -6,7 +6,7 @@ import androidx.navigation.fragment.NavHostFragment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainActivityViewModel(private val navHostFragment: NavHostFragment) : ViewModel() {
+class MainActivityViewModel : ViewModel() {
     private val _appStartDestination = MutableStateFlow<Fragment?>(null)
     val appStartDestination = _appStartDestination.asStateFlow()
 

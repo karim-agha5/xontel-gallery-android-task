@@ -36,9 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
-    private val mainActivityViewModel: MainActivityViewModel by viewModels{
-        MainActivityViewModelFactory(navHostFragment)
-    }
+    private val mainActivityViewModel by viewModels<MainActivityViewModel>()
     private lateinit var galleryStartDestination: GalleryStartDestination
     private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
     private lateinit var permissionsHandler: MediaPermissionsHandler
