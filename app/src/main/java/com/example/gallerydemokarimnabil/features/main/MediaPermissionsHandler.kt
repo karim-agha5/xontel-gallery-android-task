@@ -11,6 +11,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.gallerydemokarimnabil.core.customexceptions.ActivityResultLauncherMissingException
+import com.example.gallerydemokarimnabil.core.customexceptions.ReadMediaImagesPermissionMissingException
+import com.example.gallerydemokarimnabil.core.customexceptions.ReadMediaVideosPermissionMissingException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.ReadExternalStoragePermissionException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.WriteExternalStoragePermissionException
 
@@ -64,7 +66,8 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
         if(readExternalStorage != null){
             return ActivityCompat.shouldShowRequestPermissionRationale(activity,readExternalStorage)
         }
-        throw ReadExternalStoragePermissionException()
+        throw ReadExternalStoragePermissionException("The ActivityResultLauncher<Array<String>> representing" +
+                " a strings array of permissions is missing")
     }
 
     fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
@@ -84,7 +87,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
                 readExternalStorage
             ) == PackageManager.PERMISSION_GRANTED
         }
-        throw ReadExternalStoragePermissionException()
+        throw ReadExternalStoragePermissionException("ReadExternalStorage is not initialized")
     }
 
     fun isWriteExternalStoragePermissionGranted() : Boolean{
@@ -94,7 +97,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
                 writeExternalStorage
             ) == PackageManager.PERMISSION_GRANTED
         }
-        throw WriteExternalStoragePermissionException()
+        throw WriteExternalStoragePermissionException("WriteExternalStorage is not initialized")
     }
 
     fun isReadMediaImagesPermissionGranted() : Boolean{
@@ -105,7 +108,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
             ) == PackageManager.PERMISSION_GRANTED
         }
         // TODO throw custom exception -- this one is a placeholder
-        throw ReadExternalStoragePermissionException()
+        throw ReadMediaImagesPermissionMissingException("ReadMediaImages permission is not initialized")
     }
 
     fun isReadMediaVideosPermissionGranted() : Boolean{
@@ -116,7 +119,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
             ) == PackageManager.PERMISSION_GRANTED
         }
         // TODO throw custom exception -- this one is a placeholder
-        throw ReadExternalStoragePermissionException()
+        throw ReadMediaVideosPermissionMissingException("ReadMediaVideos permission is not initialized")
     }
 
     private fun isPermissionGranted(permission: String) : Boolean{

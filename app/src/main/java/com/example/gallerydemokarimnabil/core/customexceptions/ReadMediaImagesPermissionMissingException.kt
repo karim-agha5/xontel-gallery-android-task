@@ -1,6 +1,6 @@
 package com.example.gallerydemokarimnabil.core.customexceptions
 
-class ActivityResultLauncherMissingException : Exception {
+class ReadMediaImagesPermissionMissingException : Exception {
     constructor() : super()
     constructor(message: String) : super(message)
     constructor(cause: Throwable) : super(cause)
