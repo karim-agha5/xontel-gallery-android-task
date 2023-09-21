@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.gallerydemokarimnabil.core.GalleryDemoApp
-import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
+import com.example.gallerydemokarimnabil.core.helpers.MediaPermissionsHandler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +19,7 @@ object ImagesFragmentModule {
     @Provides
     fun provideMediaPermissionHandler(
         @ApplicationContext context: Context
-    ) : MediaPermissionsHandler{
+    ) : MediaPermissionsHandler {
         val application = context.applicationContext as GalleryDemoApp
         when{
             Build.VERSION.SDK_INT < Build.VERSION_CODES.P -> {
