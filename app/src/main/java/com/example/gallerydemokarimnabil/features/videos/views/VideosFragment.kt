@@ -51,6 +51,7 @@ class VideosFragment : Fragment() {
         // If config. changes
         if(videosViewModel.videosThumbnailState.value.isNotEmpty()){
             initRecyclerView(videosViewModel.videosThumbnailState.value)
+            binding.videoCircularLoadingIndicator.visibility = View.GONE
         }
         else{
             lifecycleScope.launch {
@@ -63,6 +64,7 @@ class VideosFragment : Fragment() {
         when{
             bitmapsList.isNotEmpty() -> {
                 // TODO constantly attaching new adapters and layout managers on config changes - fix later.
+                binding.videoCircularLoadingIndicator.visibility = View.GONE
                 initRecyclerView(bitmapsList)
             }
             else -> {

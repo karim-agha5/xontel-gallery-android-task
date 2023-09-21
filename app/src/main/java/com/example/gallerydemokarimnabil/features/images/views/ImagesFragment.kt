@@ -55,6 +55,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
         if(arePermissionsGranted()){
             // If config. changes
             if(imagesViewModel.imagesState.value.isNotEmpty()){
+                binding.imagesCircularLoadingIndicator.visibility = View.GONE
                 initRecyclerView(imagesViewModel.imagesState.value)
             }
             else{
@@ -71,6 +72,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
             drawablesList.isNotEmpty() -> {
                 // TODO constantly attaching new adapters and layout managers on config changes - fix later.
                 initRecyclerView(drawablesList)
+                binding.imagesCircularLoadingIndicator.visibility = View.GONE
             }
             else -> {
                 imagesViewModel.loadImages()
