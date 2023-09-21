@@ -2,6 +2,7 @@ package com.example.gallerydemokarimnabil.features.videos.views
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +14,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.databinding.FragmentVideosBinding
 import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
+import com.example.gallerydemokarimnabil.features.videos.data.LocalStorageVideoIdDataSource
+import com.example.gallerydemokarimnabil.features.videos.data.VideoRepository
 import com.example.gallerydemokarimnabil.features.videos.helpers.IdToBitmapMapperImpl
 import com.example.gallerydemokarimnabil.features.videos.helpers.MediaStoreVideosIdsFetcherImpl
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModelFactory
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class VideosFragment : Fragment() {
@@ -24,9 +28,9 @@ class VideosFragment : Fragment() {
     private lateinit var binding: FragmentVideosBinding
     private val videosViewModel: VideosViewModel by viewModels{
         val application = requireActivity().application
+        val fetcher = MediaStoreVideosIdsFetcherImpl(application)
         VideosViewModelFactory(
-            application,
-            MediaStoreVideosIdsFetcherImpl(application),
+            VideoRepository(LocalStorageVideoIdDataSource(fetcher)),
             IdToBitmapMapperImpl(application)
         )
     }
@@ -91,9 +95,13 @@ class VideosFragment : Fragment() {
                 }
             }
             is VideosThumbnailsFetchStatus.Failure -> {
-
+                Log.i("MainActivity", "Unable to retrieve videos in " +
+                        this@VideosFragment.javaClass.simpleName
+                )
+                status.throwable.printStackTrace()
+                displayFailureDialog()
             }
-            else -> {}
+            else -> {/*Loading case*/}
         }
     }
 
@@ -106,5 +114,14 @@ class VideosFragment : Fragment() {
     private fun initRecyclerView(bitmapsList: List<Bitmap?>){
         binding.adapter = VideoAdapter(bitmapsList.toList())
         binding.layoutManager = GridLayoutManager(requireContext(),3)
+    }
+
+    private fun displayFailureDialog(){
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(resources.getString(R.string.dialog_error_title))
+            .setMessage(resources.getString(R.string.videos_error_message))
+            .setNeutralButton(resources.getString(R.string.error_neutral_button_text)){_,_->
+                /*Do Nothing*/
+            }
     }
 }

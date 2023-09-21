@@ -179,6 +179,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
     private fun displayFailureDialog(){
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getString(R.string.dialog_error_title))
+            .setMessage(resources.getString(R.string.images_error_message))
             .setNeutralButton(resources.getString(R.string.error_neutral_button_text)){_,_->
                 /*Do Nothing*/
             }
