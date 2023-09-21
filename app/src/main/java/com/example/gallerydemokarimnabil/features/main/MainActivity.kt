@@ -17,6 +17,7 @@ import androidx.navigation.navOptions
 import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.core.Utils
+import com.example.gallerydemokarimnabil.core.helpers.MediaPermissionsHandler
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
 import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel

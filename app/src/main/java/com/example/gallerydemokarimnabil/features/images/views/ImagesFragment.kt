@@ -23,7 +23,7 @@ import com.example.gallerydemokarimnabil.features.images.helpers.MediaStoreImage
 import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMapperImpl
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory
-import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
+import com.example.gallerydemokarimnabil.core.helpers.MediaPermissionsHandler
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
