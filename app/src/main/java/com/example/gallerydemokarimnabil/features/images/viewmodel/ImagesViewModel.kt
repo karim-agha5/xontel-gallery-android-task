@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriCollectionToDrawables
 import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.IImageUriFetcher
+import com.example.gallerydemokarimnabil.features.images.ImagesFetchStatus
 import com.example.gallerydemokarimnabil.features.main.MainActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,8 @@ class ImagesViewModel(
     private val uriCollectionToDrawablesMapper: IFromUriCollectionToDrawables
     ) : ViewModel() {
 
-    private val _imagesState = MutableStateFlow<List<Drawable?>>(listOf())
+    //private val _imagesState = MutableStateFlow<List<Drawable?>>(listOf())
+    private val _imagesState = MutableStateFlow<ImagesFetchStatus>(ImagesFetchStatus.Loading)
     val imagesState = _imagesState.asStateFlow()
 
     /*
@@ -35,6 +37,7 @@ class ImagesViewModel(
         val urisList = imageUriFetcher.fetchImageUris()
         val images = uriCollectionToDrawablesMapper.fromUrisToDrawables(urisList)
 
-        _imagesState.value = images
+        //_imagesState.value = images
+        _imagesState.value = ImagesFetchStatus.Success(images)
     }
 }

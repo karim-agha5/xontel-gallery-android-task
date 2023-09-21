@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.FragmentImagesBinding
+import com.example.gallerydemokarimnabil.features.images.ImagesFetchStatus
 import com.example.gallerydemokarimnabil.features.images.helpers.MediaStoreImageUriFetcher
 import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMapperImpl
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory
 import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
+import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
 import kotlinx.coroutines.launch
 
 class ImagesFragment : Fragment(),GalleryStartDestination {
@@ -52,7 +54,21 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         if(arePermissionsGranted()){
+            lifecycleScope.launch {
+                // TODO loads videos when config changes -- fix later
+                imagesViewModel.loadImages()
+                imagesViewModel.imagesState.collect{
+                    setUiState(it)
+                }
+            }
+        }
+
+
+
+
+        /*if(arePermissionsGranted()){
             // If config. changes
             if(imagesViewModel.imagesState.value.isNotEmpty()){
                 binding.imagesCircularLoadingIndicator.visibility = View.GONE
@@ -63,11 +79,11 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
                     imagesViewModel.imagesState.collect{ setUiState(it) }
                 }
             }
-        }
+        }*/
 
     }
 
-    private fun setUiState(drawablesList: List<Drawable?>){
+    /*private fun setUiState(drawablesList: List<Drawable?>){
         when{
             drawablesList.isNotEmpty() -> {
                 // TODO constantly attaching new adapters and layout managers on config changes - fix later.
@@ -78,6 +94,30 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
                 imagesViewModel.loadImages()
             }
         }
+    }*/
+
+    private fun setUiState(status: ImagesFetchStatus){
+        when(status){
+            is ImagesFetchStatus.Success -> {
+                if(status.list.isEmpty()){
+                    onListIsEmpty()
+                }
+                else{
+                    initRecyclerView(status.list)
+                    binding.imagesCircularLoadingIndicator.visibility = View.GONE
+                }
+            }
+            is ImagesFetchStatus.Failure -> {
+
+            }
+            else -> {}
+        }
+    }
+
+    private fun onListIsEmpty(){
+        binding.tvNoImagesToShow.visibility = View.VISIBLE
+        binding.imagesCircularLoadingIndicator.visibility = View.GONE
+        binding.rvImages.visibility = View.GONE
     }
 
     private fun initRecyclerView(drawablesList: List<Drawable?>){
@@ -93,7 +133,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
     override fun invokeWhenPermissionsGranted() {
         lifecycleScope.launch {
             imagesViewModel.imagesState.collect{
-                initRecyclerView(it)
+                setUiState(it)
             }
         }
         imagesViewModel.loadImages()

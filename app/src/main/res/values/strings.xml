@@ -29,6 +29,8 @@
     <string name="image_desc">Gallery Image</string>
     <string name="video_desc">Gallery Video Thumbnail</string>
     <string name="video_play_button_desc">Gallery Video Thumbnail Play Button</string>
+    <string name="no_images_text">There are no images to show</string>
+    <string name="no_videos_text">There are no videos to show</string>
 
     <!-- End ImageViews description contents -->
 

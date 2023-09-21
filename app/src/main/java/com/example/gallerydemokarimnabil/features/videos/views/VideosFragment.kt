@@ -1,9 +1,7 @@
 package com.example.gallerydemokarimnabil.features.videos.views
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.databinding.FragmentVideosBinding
-import com.example.gallerydemokarimnabil.features.images.views.ImageAdapter
+import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
 import com.example.gallerydemokarimnabil.features.videos.helpers.IdToBitmapMapperImpl
 import com.example.gallerydemokarimnabil.features.videos.helpers.MediaStoreVideosIdsFetcherImpl
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModelFactory
@@ -48,8 +46,16 @@ class VideosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        lifecycleScope.launch {
+            // TODO loads videos when config changes -- fix later
+            videosViewModel.loadVideosThumbnails()
+            videosViewModel.videosThumbnailState.collect{
+                setUiState(it)
+            }
+        }
+
         // If config. changes
-        if(videosViewModel.videosThumbnailState.value.isNotEmpty()){
+        /*if(videosViewModel.videosThumbnailState.value.isNotEmpty()){
             initRecyclerView(videosViewModel.videosThumbnailState.value)
             binding.videoCircularLoadingIndicator.visibility = View.GONE
         }
@@ -57,10 +63,10 @@ class VideosFragment : Fragment() {
             lifecycleScope.launch {
                 videosViewModel.videosThumbnailState.collect{ setUiState(it) }
             }
-        }
+        }*/
     }
 
-    private fun setUiState(bitmapsList: List<Bitmap?>){
+    /*private fun setUiState(bitmapsList: List<Bitmap?>){
         when{
             bitmapsList.isNotEmpty() -> {
                 // TODO constantly attaching new adapters and layout managers on config changes - fix later.
@@ -71,6 +77,30 @@ class VideosFragment : Fragment() {
                 videosViewModel.loadVideosThumbnails()
             }
         }
+    }*/
+
+    private fun setUiState(status: VideosThumbnailsFetchStatus){
+        when(status){
+            is VideosThumbnailsFetchStatus.Success -> {
+                if(status.list.isEmpty()){
+                    onListIsEmpty()
+                }
+                else{
+                    initRecyclerView(status.list)
+                    binding.videoCircularLoadingIndicator.visibility = View.GONE
+                }
+            }
+            is VideosThumbnailsFetchStatus.Failure -> {
+
+            }
+            else -> {}
+        }
+    }
+
+    private fun onListIsEmpty(){
+        binding.tvNoVideosToShow.visibility = View.VISIBLE
+        binding.videoCircularLoadingIndicator.visibility = View.GONE
+        binding.rvVideos.visibility = View.GONE
     }
 
     private fun initRecyclerView(bitmapsList: List<Bitmap?>){
