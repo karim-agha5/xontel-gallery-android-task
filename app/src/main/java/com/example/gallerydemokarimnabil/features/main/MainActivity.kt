@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -21,7 +20,6 @@ import com.example.gallerydemokarimnabil.core.Utils
 import com.example.gallerydemokarimnabil.core.helpers.MediaPermissionsHandler
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
-import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
-    private val mainActivityViewModel by viewModels<MainActivityViewModel>()
     private lateinit var galleryStartDestination: GalleryStartDestination
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
