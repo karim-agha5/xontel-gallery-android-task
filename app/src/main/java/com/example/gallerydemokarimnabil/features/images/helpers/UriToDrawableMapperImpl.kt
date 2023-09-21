@@ -4,8 +4,8 @@ import android.app.Application
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
-import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriCollectionToDrawables
-import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriToDrawable
+import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromUriCollectionToDrawables
+import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromUriToDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -13,7 +13,7 @@ import java.io.InputStream
 
 class UriToDrawableMapperImpl(
     private val application: Application
-    ) : IFromUriToDrawable, IFromUriCollectionToDrawables{
+    ) : IFromUriToDrawable, IFromUriCollectionToDrawables {
 
     private var inputStream: InputStream? = null
 
@@ -41,8 +41,8 @@ class UriToDrawableMapperImpl(
                 }
                 inputStream = application.contentResolver.openInputStream(uri)
                 drawablesList.add(Drawable.createFromStream(inputStream,uri.toString()))
+                inputStream?.close()
             }
-            inputStream?.close()
         }
 
         return drawablesList.toList()

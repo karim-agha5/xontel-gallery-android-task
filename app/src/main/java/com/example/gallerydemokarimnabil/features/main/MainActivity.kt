@@ -2,6 +2,7 @@ package com.example.gallerydemokarimnabil.features.main
 
 import android.os.Build
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
+        initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setScreenViewsToGone()
@@ -102,6 +104,26 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
+
+
+    }
+
+    // TODO remove before delivery
+    private fun initStrictPolicy(){
+        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+            .detectDiskReads()
+            .detectDiskWrites()
+            .penaltyLog()
+            .penaltyDeath()
+            .build())
+
+        StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+            .detectLeakedSqlLiteObjects()
+            .detectLeakedClosableObjects()
+            .penaltyLog()
+            .penaltyDeath()
+            .build())
     }
 
     private fun initNavComponents(){

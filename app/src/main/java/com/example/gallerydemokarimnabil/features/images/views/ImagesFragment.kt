@@ -24,7 +24,6 @@ import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMa
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory
 import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
-import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
@@ -36,7 +35,6 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
         val application = requireActivity().application
         val fetcher = MediaStoreImageUriFetcher(application)
         ImagesViewModelFactory(
-            // MediaStoreImageUriFetcher(application),
             ImageUriRepositoryImpl(LocalStorageImageUriDataSource(fetcher)),
             UriToDrawableMapperImpl(application)
         )
@@ -70,36 +68,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
             }
         }
 
-
-
-
-        /*if(arePermissionsGranted()){
-            // If config. changes
-            if(imagesViewModel.imagesState.value.isNotEmpty()){
-                binding.imagesCircularLoadingIndicator.visibility = View.GONE
-                initRecyclerView(imagesViewModel.imagesState.value)
-            }
-            else{
-                lifecycleScope.launch {
-                    imagesViewModel.imagesState.collect{ setUiState(it) }
-                }
-            }
-        }*/
-
     }
-
-    /*private fun setUiState(drawablesList: List<Drawable?>){
-        when{
-            drawablesList.isNotEmpty() -> {
-                // TODO constantly attaching new adapters and layout managers on config changes - fix later.
-                initRecyclerView(drawablesList)
-                binding.imagesCircularLoadingIndicator.visibility = View.GONE
-            }
-            else -> {
-                imagesViewModel.loadImages()
-            }
-        }
-    }*/
 
     private fun setUiState(status: ImagesFetchStatus){
         when(status){

@@ -3,11 +3,9 @@ package com.example.gallerydemokarimnabil.features.images.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.gallerydemokarimnabil.core.interfaces.data.IImageUriRepository
-import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriCollectionToDrawables
-import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.IImageUriFetcher
+import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromUriCollectionToDrawables
 
 class ImagesViewModelFactory(
-    //private val imageUriFetcher: IImageUriFetcher,
     private val imageUriRepository: IImageUriRepository,
     private val uriCollectionToDrawablesMapper: IFromUriCollectionToDrawables
     ) : ViewModelProvider.Factory {

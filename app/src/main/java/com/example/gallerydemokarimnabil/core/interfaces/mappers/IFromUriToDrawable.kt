@@ -1,4 +1,4 @@
-package com.example.gallerydemokarimnabil.features.core.interfaces.mappers
+package com.example.gallerydemokarimnabil.core.interfaces.mappers
 
 import android.graphics.drawable.Drawable
 import android.net.Uri

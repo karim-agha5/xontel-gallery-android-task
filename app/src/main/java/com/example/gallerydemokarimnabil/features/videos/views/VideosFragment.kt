@@ -35,10 +35,6 @@ class VideosFragment : Fragment() {
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,31 +53,7 @@ class VideosFragment : Fragment() {
                 setUiState(it)
             }
         }
-
-        // If config. changes
-        /*if(videosViewModel.videosThumbnailState.value.isNotEmpty()){
-            initRecyclerView(videosViewModel.videosThumbnailState.value)
-            binding.videoCircularLoadingIndicator.visibility = View.GONE
-        }
-        else{
-            lifecycleScope.launch {
-                videosViewModel.videosThumbnailState.collect{ setUiState(it) }
-            }
-        }*/
     }
-
-    /*private fun setUiState(bitmapsList: List<Bitmap?>){
-        when{
-            bitmapsList.isNotEmpty() -> {
-                // TODO constantly attaching new adapters and layout managers on config changes - fix later.
-                binding.videoCircularLoadingIndicator.visibility = View.GONE
-                initRecyclerView(bitmapsList)
-            }
-            else -> {
-                videosViewModel.loadVideosThumbnails()
-            }
-        }
-    }*/
 
     private fun setUiState(status: VideosThumbnailsFetchStatus){
         when(status){
