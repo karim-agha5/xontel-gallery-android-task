@@ -10,8 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URLConnection
+import javax.inject.Inject
 
-class MediaStoreVideosIdsFetcherImpl(private val application: Application) : IVideosIdsFetcher {
+class MediaStoreVideosIdsFetcherImpl @Inject constructor(
+    private val application: Application
+    ) : IVideosIdsFetcher {
 
  //   private val thumbnailsList = mutableListOf<Bitmap?>()
 //    private val retriever = MediaMetadataRetriever()

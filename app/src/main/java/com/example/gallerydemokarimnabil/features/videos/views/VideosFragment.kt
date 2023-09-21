@@ -21,19 +21,22 @@ import com.example.gallerydemokarimnabil.features.videos.helpers.MediaStoreVideo
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModelFactory
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class VideosFragment : Fragment() {
 
     private lateinit var binding: FragmentVideosBinding
-    private val videosViewModel: VideosViewModel by viewModels{
+    /*private val videosViewModel: VideosViewModel by viewModels{
         val application = requireActivity().application
         val fetcher = MediaStoreVideosIdsFetcherImpl(application)
         VideosViewModelFactory(
             VideoRepository(LocalStorageVideoIdDataSource(fetcher)),
             IdToBitmapMapperImpl(application)
         )
-    }
+    }*/
+    private val videosViewModel: VideosViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

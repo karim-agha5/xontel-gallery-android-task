@@ -5,11 +5,12 @@ import com.example.gallerydemokarimnabil.core.interfaces.data.IImageUriRepositor
 import com.example.gallerydemokarimnabil.core.interfaces.data.ILocalStorageImageUriDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 /**
  * Functions in the repository are main-safe
  * */
-class ImageUriRepositoryImpl(
+class ImageUriRepositoryImpl @Inject constructor(
   private val localStorageImageUriDataSource: ILocalStorageImageUriDataSource
 ) : IImageUriRepository{
 

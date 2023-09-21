@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.gallerydemokarimnabil.core.interfaces.data.IVideoRepository
 import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromIdCollectionToBitmaps
+import javax.inject.Inject
 
-class VideosViewModelFactory(
+class VideosViewModelFactory @Inject constructor(
     private val videoRepository: IVideoRepository,
-    val idToBitmapMapperImpl: IFromIdCollectionToBitmaps
+    private val idToBitmapMapperImpl: IFromIdCollectionToBitmaps
 ) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
