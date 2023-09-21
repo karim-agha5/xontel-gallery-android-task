@@ -84,7 +84,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
                 status.throwable.printStackTrace()
                 displayFailureDialog()
             }
-            else -> {/*Loading case*/}
+            else -> {/*Loading case*/ /*imagesViewModel.loadImages()*/}
         }
     }
 
