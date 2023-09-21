@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity() {
         initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setScreenViewsToGone()
 
+        setScreenViewsToGone()
         initNavComponents()
         setAppStartDestination()
         setBottomNavViewItemsClickListeners()
@@ -51,64 +51,18 @@ class MainActivity : AppCompatActivity() {
 
 
         // Checking permissions based on the android versions
-        when{
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.P -> {
-                permissionsHandler =
-                    MediaPermissionsHandler
-                        .Builder(application)
-                        .readExternalStorage()
-                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
-                        .onPermissionsGranted(
-                            arrayOf(
-                                galleryStartDestination::invokeWhenPermissionsGranted,
-                                this::setScreenViewsToVisible
-                            )
-                        )
-                        .activityResultLauncher(requestPermissionLauncher)
-                        .build()
-
-
-                if(permissionsHandler.arePermissionsGranted()){
-                    setScreenViewsToVisible()
-                }else{
-                    permissionsHandler.requestPermissions()
-                }
-
-            }
-
-            else -> {
-
-                permissionsHandler =
-                    MediaPermissionsHandler
-                        .Builder(application)
-                        .readExternalStorage()
-                        .writeExternalStorage()
-                        .readMediaImages()
-                        .readMediaVideos()
-                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
-                        .onPermissionsGranted(
-                            arrayOf(
-                                galleryStartDestination::invokeWhenPermissionsGranted,
-                                this::setScreenViewsToVisible
-                            )
-                        )
-                        .activityResultLauncher(requestPermissionLauncher)
-                        .build()
-
-
-                if(permissionsHandler.arePermissionsGranted()){
-                    setScreenViewsToVisible()
-                }else{
-                    permissionsHandler.requestPermissions()
-                }
-
-
-
-            }
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
+            buildPermissionHandlerForSdkLessThanP(requestPermissionLauncher)
+        }
+        else{
+            buildPermissionHandlerForSdkMoreThanP(requestPermissionLauncher)
         }
 
-
-
+        if(permissionsHandler.arePermissionsGranted()){
+            setScreenViewsToVisible()
+        }else{
+            permissionsHandler.requestPermissions()
+        }
 
 
     }
@@ -130,6 +84,48 @@ class MainActivity : AppCompatActivity() {
             .build())
     }
 
+    private fun buildPermissionHandlerForSdkLessThanP(requestPermissionLauncher: ActivityResultLauncher<Array<String>>){
+        permissionsHandler =
+            MediaPermissionsHandler
+                .Builder(application)
+                .readExternalStorage()
+                //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                .onPermissionsGranted(
+                    arrayOf(
+                        this::galleryStartDestinationOnPermissionGranted,
+                        this::setScreenViewsToVisible
+                    )
+                )
+                .activityResultLauncher(requestPermissionLauncher)
+                .build()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun buildPermissionHandlerForSdkMoreThanP(requestPermissionLauncher: ActivityResultLauncher<Array<String>>){
+        permissionsHandler =
+            MediaPermissionsHandler
+                .Builder(application)
+                .readExternalStorage()
+                .writeExternalStorage()
+                .readMediaImages()
+                .readMediaVideos()
+                //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                .onPermissionsGranted(
+                    arrayOf(
+                        this::galleryStartDestinationOnPermissionGranted,
+                        this::setScreenViewsToVisible
+                    )
+                )
+                .activityResultLauncher(requestPermissionLauncher)
+                .build()
+    }
+
+    private fun galleryStartDestinationOnPermissionGranted(){
+        if(this::galleryStartDestination.isInitialized){
+            galleryStartDestination.invokeWhenPermissionsGranted()
+        }
+    }
+
     private fun initNavComponents(){
          navHostFragment =
             supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
@@ -137,14 +133,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAppStartDestination(){
-        if(mainActivityViewModel.appStartDestination.value != null){
-            galleryStartDestination =
-                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
-        }
-        else{
-            mainActivityViewModel.setAppStartDestination(navHostFragment)
-            galleryStartDestination =
-                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
+        val attachedFragment = navHostFragment.childFragmentManager.fragments[0]
+        if(attachedFragment is GalleryStartDestination){
+            galleryStartDestination = attachedFragment
         }
     }
 
@@ -229,46 +220,53 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun handlePermissionResultsWhenSdkLessThanP() {
+        if(permissionsHandler.isReadExternalStoragePermissionGranted()){
+            permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
+        }
+        else{
+            if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
+                setScreenViewsToGone()
+                permissionRationaleAction()
+            }
+            else{
+                noPermissionRationaleAction()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun handlePermissionResultsWhenSdkMoreThanP() {
+        if(
+            permissionsHandler.isReadMediaImagesPermissionGranted()
+            &&
+            permissionsHandler.isReadMediaVideosPermissionGranted()
+        ){
+            permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
+        }
+        if(
+            !permissionsHandler.isReadMediaImagesPermissionGranted()
+            &&
+            !permissionsHandler.isReadMediaVideosPermissionGranted()
+        ){
+            if(permissionsHandler.shouldShowRationaleForReadImagesAndVideos(this)){
+                setScreenViewsToGone()
+                permissionRationaleAction()
+            }
+            else{
+                noPermissionRationaleAction()
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun onPermissionResult() : ActivityResultLauncher<Array<String>>{
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
-                if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
-                    /*setScreenViewsToVisible()
-                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
-                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
-                }
-                else{
-                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
-                        setScreenViewsToGone()
-                        permissionRationaleAction()
-                    }
-                    else{
-                        noPermissionRationaleAction()
-                    }
-                }
+                handlePermissionResultsWhenSdkLessThanP()
             }
             else{
-                if(
-                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == true
-                    &&
-                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == true
-                ){
-                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
-                }
-                if(
-                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == false
-                    &&
-                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == false
-                ){
-                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
-                        setScreenViewsToGone()
-                        permissionRationaleAction()
-                    }
-                    else{
-                        noPermissionRationaleAction()
-                    }
-                }
+                handlePermissionResultsWhenSdkMoreThanP()
             }
         }
     }

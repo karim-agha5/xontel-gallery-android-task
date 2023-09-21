@@ -70,6 +70,17 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
                 " a strings array of permissions is missing")
     }
 
+    fun shouldShowRationaleForReadImagesAndVideos(activity: Activity) : Boolean{
+        if(readMediaImages == null){
+            throw ReadMediaImagesPermissionMissingException()
+        }
+        else if(readMediaVideos == null){
+            throw ReadMediaVideosPermissionMissingException()
+        }
+        return  ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaImages) &&
+                ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaVideos)
+    }
+
     fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
 
     fun invokeMultipleOnPermissionsGrantedIfProvided(){
