@@ -2,8 +2,9 @@ package com.example.gallerydemokarimnabil.features.videos.data
 
 import com.example.gallerydemokarimnabil.core.interfaces.data.ILocalStorageVideoIdFetcher
 import com.example.gallerydemokarimnabil.core.interfaces.mediastorefetchers.IVideosIdsFetcher
+import javax.inject.Inject
 
-class LocalStorageVideoIdDataSource(
+class LocalStorageVideoIdDataSource @Inject constructor(
   private val videoIdFetcher : IVideosIdsFetcher
 ) : ILocalStorageVideoIdFetcher{
 

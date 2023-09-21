@@ -7,8 +7,9 @@ import android.provider.MediaStore
 import com.example.gallerydemokarimnabil.core.interfaces.mediastorefetchers.IImageUriFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class MediaStoreImageUriFetcher(private val application: Application) : IImageUriFetcher {
+class MediaStoreImageUriFetcher @Inject constructor(private val application: Application) : IImageUriFetcher {
 
     override suspend fun fetchImageUris(): List<Uri> {
         val urisList = mutableListOf<Uri>()

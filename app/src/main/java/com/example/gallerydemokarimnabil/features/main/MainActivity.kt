@@ -22,7 +22,9 @@ import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
 import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -251,8 +253,6 @@ class MainActivity : AppCompatActivity() {
                     &&
                     it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == true
                 ){
-                    /*setScreenViewsToVisible()
-                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
                     permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
                 }
                 if(
