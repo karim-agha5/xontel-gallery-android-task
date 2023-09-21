@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.gallerydemokarimnabil.core.interfaces.data.IImageUriRepository
 import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromUriCollectionToDrawables
 import com.example.gallerydemokarimnabil.features.images.ImagesFetchStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // TODO inject the class responsible for loading the images' Uris and the mapper
-class ImagesViewModel(
+
+@HiltViewModel
+class ImagesViewModel @Inject constructor(
     private val imageUriRepository: IImageUriRepository,
     private val uriCollectionToDrawablesMapper: IFromUriCollectionToDrawables
     ) : ViewModel() {

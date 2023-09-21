@@ -10,8 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import javax.inject.Inject
 
-class UriToDrawableMapperImpl(
+class UriToDrawableMapperImpl @Inject constructor(
     private val application: Application
     ) : IFromUriToDrawable, IFromUriCollectionToDrawables {
 

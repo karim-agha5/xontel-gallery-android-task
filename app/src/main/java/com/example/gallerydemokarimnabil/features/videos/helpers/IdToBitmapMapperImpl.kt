@@ -6,8 +6,11 @@ import android.provider.MediaStore
 import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromIdCollectionToBitmaps
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class IdToBitmapMapperImpl(private val application: Application) : IFromIdCollectionToBitmaps {
+class IdToBitmapMapperImpl @Inject constructor(
+    private val application: Application
+    ) : IFromIdCollectionToBitmaps {
 
     override suspend fun fromIdsToBitmaps(listOfIds: List<Long>): List<Bitmap?> {
         val bitmapsList = mutableListOf<Bitmap>()

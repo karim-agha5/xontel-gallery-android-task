@@ -23,22 +23,18 @@ import com.example.gallerydemokarimnabil.features.images.helpers.MediaStoreImage
 import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMapperImpl
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory
-import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
+import com.example.gallerydemokarimnabil.core.helpers.MediaPermissionsHandler
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ImagesFragment : Fragment(),GalleryStartDestination {
 
     private lateinit var binding: FragmentImagesBinding
-    private lateinit var permissionsHandler: MediaPermissionsHandler
-    private val imagesViewModel: ImagesViewModel by viewModels {
-        val application = requireActivity().application
-        val fetcher = MediaStoreImageUriFetcher(application)
-        ImagesViewModelFactory(
-            ImageUriRepositoryImpl(LocalStorageImageUriDataSource(fetcher)),
-            UriToDrawableMapperImpl(application)
-        )
-    }
+    @Inject lateinit var permissionsHandler: MediaPermissionsHandler
+    private val imagesViewModel: ImagesViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {

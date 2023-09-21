@@ -1,4 +1,4 @@
-package com.example.gallerydemokarimnabil.features.main
+package com.example.gallerydemokarimnabil.core.helpers
 
 import android.Manifest
 import android.app.Activity
@@ -68,6 +68,17 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
         }
         throw ReadExternalStoragePermissionException("The ActivityResultLauncher<Array<String>> representing" +
                 " a strings array of permissions is missing")
+    }
+
+    fun shouldShowRationaleForReadImagesAndVideos(activity: Activity) : Boolean{
+        if(readMediaImages == null){
+            throw ReadMediaImagesPermissionMissingException()
+        }
+        else if(readMediaVideos == null){
+            throw ReadMediaVideosPermissionMissingException()
+        }
+        return  ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaImages) &&
+                ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaVideos)
     }
 
     fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
@@ -175,7 +186,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
          * @return [Builder]
          * */
         fun readExternalStorage() = apply {
-            readExternalStorage = MediaPermissionsHandler.READ_EXTERNAL_STORAGE
+            readExternalStorage = READ_EXTERNAL_STORAGE
             permissionsList.add(readExternalStorage!!)
         }
 
@@ -184,7 +195,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
          * @return [Builder]
          * */
         fun writeExternalStorage() = apply {
-            writeExternalStorage = MediaPermissionsHandler.WRITE_EXTERNAL_STORAGE
+            writeExternalStorage = WRITE_EXTERNAL_STORAGE
             permissionsList.add(writeExternalStorage!!)
         }
 
@@ -194,7 +205,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
          * */
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         fun readMediaImages() = apply {
-            readMediaImages = MediaPermissionsHandler.READ_MEDIA_IMAGES
+            readMediaImages = READ_MEDIA_IMAGES
             permissionsList.add(readMediaImages!!)
         }
 
@@ -204,7 +215,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
          * */
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         fun readMediaVideos() = apply {
-            readMediaVideos = MediaPermissionsHandler.READ_MEDIA_VIDEOS
+            readMediaVideos = READ_MEDIA_VIDEOS
             permissionsList.add(readMediaVideos!!)
         }
 
