@@ -3,6 +3,7 @@ package com.example.gallerydemokarimnabil.features.main
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
+import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        Log.i("MainActivity", "onCreate: ")
         setScreenViewsToGone()
 
         initNavComponents()
