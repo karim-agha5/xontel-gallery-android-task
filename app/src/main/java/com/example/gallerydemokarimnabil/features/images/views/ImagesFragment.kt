@@ -17,12 +17,15 @@ import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.FragmentImagesBinding
 import com.example.gallerydemokarimnabil.features.images.ImagesFetchStatus
+import com.example.gallerydemokarimnabil.features.images.data.ImageUriRepositoryImpl
+import com.example.gallerydemokarimnabil.features.images.data.LocalStorageImageUriDataSource
 import com.example.gallerydemokarimnabil.features.images.helpers.MediaStoreImageUriFetcher
 import com.example.gallerydemokarimnabil.features.images.helpers.UriToDrawableMapperImpl
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModel
 import com.example.gallerydemokarimnabil.features.images.viewmodel.ImagesViewModelFactory
 import com.example.gallerydemokarimnabil.features.main.MediaPermissionsHandler
 import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class ImagesFragment : Fragment(),GalleryStartDestination {
@@ -31,8 +34,10 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
     private lateinit var permissionsHandler: MediaPermissionsHandler
     private val imagesViewModel: ImagesViewModel by viewModels {
         val application = requireActivity().application
+        val fetcher = MediaStoreImageUriFetcher(application)
         ImagesViewModelFactory(
-            MediaStoreImageUriFetcher(application),
+            // MediaStoreImageUriFetcher(application),
+            ImageUriRepositoryImpl(LocalStorageImageUriDataSource(fetcher)),
             UriToDrawableMapperImpl(application)
         )
     }
@@ -108,9 +113,13 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
                 }
             }
             is ImagesFetchStatus.Failure -> {
-
+                Log.i("MainActivity", "Unable to retrieve images in " +
+                        this@ImagesFragment.javaClass.simpleName
+                )
+                status.throwable.printStackTrace()
+                displayFailureDialog()
             }
-            else -> {}
+            else -> {/*Loading case*/}
         }
     }
 
@@ -165,5 +174,13 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
             }
         }
 
+    }
+
+    private fun displayFailureDialog(){
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(resources.getString(R.string.dialog_error_title))
+            .setNeutralButton(resources.getString(R.string.error_neutral_button_text)){_,_->
+                /*Do Nothing*/
+            }
     }
 }

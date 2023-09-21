@@ -33,5 +33,15 @@
     <string name="no_videos_text">There are no videos to show</string>
 
     <!-- End ImageViews description contents -->
+    
+    
+    
+    <!-- Start Alert Dialog -->
+    
+    <string name="dialog_error_title">Error</string>
+    <string name="images_error_message">Unable to retrieve images</string>
+    <string name="error_neutral_button_text">Cancel</string>
+
+    <!-- End Alert Dialog -->
 
 </resources>
