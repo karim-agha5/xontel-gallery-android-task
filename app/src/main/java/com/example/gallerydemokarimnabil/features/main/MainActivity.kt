@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        Log.i("MainActivity", "onCreate: ")
         setScreenViewsToGone()
 
         initNavComponents()
