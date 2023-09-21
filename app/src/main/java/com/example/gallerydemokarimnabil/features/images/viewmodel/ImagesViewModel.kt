@@ -1,5 +1,6 @@
 package com.example.gallerydemokarimnabil.features.images.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gallerydemokarimnabil.core.interfaces.data.IImageUriRepository
@@ -27,6 +28,7 @@ class ImagesViewModel @Inject constructor(
     * This function is main-safe
     * */
     fun loadImages(){
+        Log.i("MainActivity", "calling loadImages...")
         // Fetch the data as long as the view model is kept alive in case of config change happens.
         viewModelScope.launch {
             loadImagesFromInternalStorage()

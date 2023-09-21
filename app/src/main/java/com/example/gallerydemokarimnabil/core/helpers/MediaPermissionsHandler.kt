@@ -72,10 +72,10 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
 
     fun shouldShowRationaleForReadImagesAndVideos(activity: Activity) : Boolean{
         if(readMediaImages == null){
-            throw ReadMediaImagesPermissionMissingException()
+            throw ReadMediaImagesPermissionMissingException("ReadMediaImages permission is not initialized")
         }
         else if(readMediaVideos == null){
-            throw ReadMediaVideosPermissionMissingException()
+            throw ReadMediaVideosPermissionMissingException("ReadMediaVideos permission is not initialized")
         }
         return  ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaImages) &&
                 ActivityCompat.shouldShowRequestPermissionRationale(activity,readMediaVideos)
@@ -83,6 +83,9 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
 
     fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
 
+    /**
+     * Invokes the following functions when permissions are granted
+     * */
     fun invokeMultipleOnPermissionsGrantedIfProvided(){
         if(onPermissionsGrantedArray != null) {
             for(func in onPermissionsGrantedArray){
@@ -129,7 +132,6 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
                 readMediaVideos
             ) == PackageManager.PERMISSION_GRANTED
         }
-        // TODO throw custom exception -- this one is a placeholder
         throw ReadMediaVideosPermissionMissingException("ReadMediaVideos permission is not initialized")
     }
 
@@ -238,6 +240,11 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
             this.onPermissionsGranted = func
         }
 
+        /**
+         * Initializes [MediaPermissionsHandler.onPermissionsGrantedArray]
+         * Executes the given functions once a permission(s) is granted.
+         * @return [Builder]
+         * */
         fun onPermissionsGranted(funcs: Array<(() -> Unit)>?) = apply{
             this.onPermissionsGrantedArray = funcs
         }

@@ -3,7 +3,6 @@ package com.example.gallerydemokarimnabil.features.main
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
-import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
-        initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
@@ -129,6 +127,11 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.findNavController()
     }
 
+    /*
+    * Necessary to execute the starting behavior of the app once permission(s) are granted
+    *  no matter what the StartDestination is as long as
+    * the start destination implements the GalleryStartDestination interface
+    * */
     private fun setAppStartDestination(){
         val attachedFragment = navHostFragment.childFragmentManager.fragments[0]
         if(attachedFragment is GalleryStartDestination){
@@ -270,6 +273,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
+        // Assuming that the desired behavior will always be to
+        // go back to the app's start destination when the back button is pressed
+        // no matter which tab the user is currently on with no flow other than the visible tabs
         binding.bnvGlobal.menu.findItem(R.id.images).isChecked = true
     }
 }

@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+/**
+ * Functions in the repository are main-safe
+ * */
 class VideoRepository @Inject constructor(
   private val localStorageVideoIdFetcher: ILocalStorageVideoIdFetcher
 ) : IVideoRepository{

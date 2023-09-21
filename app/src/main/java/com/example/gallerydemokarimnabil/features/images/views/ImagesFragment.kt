@@ -57,7 +57,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
         if(arePermissionsGranted()){
             lifecycleScope.launch {
                 // TODO loads videos when config changes -- fix later
-                imagesViewModel.loadImages()
+                //imagesViewModel.loadImages()
                 imagesViewModel.imagesState.collect{
                     setUiState(it)
                 }
@@ -84,7 +84,7 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
                 status.throwable.printStackTrace()
                 displayFailureDialog()
             }
-            else -> {/*Loading case*/}
+            else -> {/*Loading case*/ imagesViewModel.loadImages()}
         }
     }
 

@@ -14,11 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gallerydemokarimnabil.R
 import com.example.gallerydemokarimnabil.databinding.FragmentVideosBinding
 import com.example.gallerydemokarimnabil.features.videos.VideosThumbnailsFetchStatus
-import com.example.gallerydemokarimnabil.features.videos.data.LocalStorageVideoIdDataSource
-import com.example.gallerydemokarimnabil.features.videos.data.VideoRepository
-import com.example.gallerydemokarimnabil.features.videos.helpers.IdToBitmapMapperImpl
-import com.example.gallerydemokarimnabil.features.videos.helpers.MediaStoreVideosIdsFetcherImpl
-import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModelFactory
 import com.example.gallerydemokarimnabil.features.videos.viewmodel.VideosViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,14 +23,6 @@ import kotlinx.coroutines.launch
 class VideosFragment : Fragment() {
 
     private lateinit var binding: FragmentVideosBinding
-    /*private val videosViewModel: VideosViewModel by viewModels{
-        val application = requireActivity().application
-        val fetcher = MediaStoreVideosIdsFetcherImpl(application)
-        VideosViewModelFactory(
-            VideoRepository(LocalStorageVideoIdDataSource(fetcher)),
-            IdToBitmapMapperImpl(application)
-        )
-    }*/
     private val videosViewModel: VideosViewModel by viewModels()
 
     override fun onCreateView(
@@ -51,7 +38,7 @@ class VideosFragment : Fragment() {
 
         lifecycleScope.launch {
             // TODO loads videos when config changes -- fix later
-            videosViewModel.loadVideosThumbnails()
+            //videosViewModel.loadVideosThumbnails()
             videosViewModel.videosThumbnailState.collect{
                 setUiState(it)
             }
@@ -76,7 +63,7 @@ class VideosFragment : Fragment() {
                 status.throwable.printStackTrace()
                 displayFailureDialog()
             }
-            else -> {/*Loading case*/}
+            else -> {/*Loading case*/videosViewModel.loadVideosThumbnails()}
         }
     }
 
