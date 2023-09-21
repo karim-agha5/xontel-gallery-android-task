@@ -1,13 +1,17 @@
 package com.example.gallerydemokarimnabil.features.main
 
+import android.app.Activity
 import android.content.ContentUris
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -22,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
+import com.example.gallerydemokarimnabil.core.Utils
 import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
 import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel
@@ -189,8 +194,12 @@ class MainActivity : AppCompatActivity() {
         binding.bnvGlobal.visibility = View.VISIBLE
     }
 
-    private fun showPermissionRationale(){
+    private fun permissionRationaleAction(){
         showPermanentSnackbar()
+    }
+
+    private fun noPermissionRationaleAction(){
+        showPermanentSnackbarForDeviceSettings()
     }
 
     private fun showPermanentSnackbar(){
@@ -198,6 +207,15 @@ class MainActivity : AppCompatActivity() {
             .make(binding.root,R.string.permanent_snackbar_message,Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.permanent_snackbar_button_label){
                 permissionsHandler.requestPermissions()
+            }
+            .show()
+    }
+
+    private fun showPermanentSnackbarForDeviceSettings(){
+        Snackbar
+            .make(binding.root,R.string.permanent_snackbar_message_no_rationale,Snackbar.LENGTH_INDEFINITE)
+            .setAction(R.string.permanent_snackbar_button_label_no_rationale){
+                Utils.openDeviceSettings(this)
             }
             .show()
     }
@@ -214,7 +232,10 @@ class MainActivity : AppCompatActivity() {
                 else{
                     if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
                         setScreenViewsToGone()
-                        showPermissionRationale()
+                        permissionRationaleAction()
+                    }
+                    else{
+                        noPermissionRationaleAction()
                     }
                 }
             }
@@ -224,9 +245,9 @@ class MainActivity : AppCompatActivity() {
                     &&
                     it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == true
                 ){
-                    setScreenViewsToVisible()
-                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()
-                    //loadImages()
+                    /*setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
+                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
                 }
                 if(
                     it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == false
@@ -235,11 +256,13 @@ class MainActivity : AppCompatActivity() {
                 ){
                     if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
                         setScreenViewsToGone()
-                        showPermissionRationale()
+                        permissionRationaleAction()
+                    }
+                    else{
+                        noPermissionRationaleAction()
                     }
                 }
             }
         }
     }
-
 }
