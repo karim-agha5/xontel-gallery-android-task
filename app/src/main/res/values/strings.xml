@@ -10,11 +10,39 @@
 
     <!-- End Bottom Navigation Bar items -->
 
+
+
     <!-- Start Snackbars messages and buttons -->
 
     <string name="permanent_snackbar_message">Permission is required to get the media</string>
     <string name="permanent_snackbar_button_label">Enable</string>
-    <string name="image_desc">Gallery Image</string>
+    <string name="permanent_snackbar_message_no_rationale">Permission is required to get the media from settings</string>
+    <string name="permanent_snackbar_button_label_no_rationale">Settings</string>
+
 
     <!-- End Snackbars messages and buttons -->
+
+
+
+    <!-- Start ImageViews description contents -->
+
+    <string name="image_desc">Gallery Image</string>
+    <string name="video_desc">Gallery Video Thumbnail</string>
+    <string name="video_play_button_desc">Gallery Video Thumbnail Play Button</string>
+    <string name="no_images_text">There are no images to show</string>
+    <string name="no_videos_text">There are no videos to show</string>
+
+    <!-- End ImageViews description contents -->
+    
+    
+    
+    <!-- Start Alert Dialog -->
+    
+    <string name="dialog_error_title">Error</string>
+    <string name="images_error_message">Unable to retrieve images</string>
+    <string name="videos_error_message">Unable to retrieve videos</string>
+    <string name="error_neutral_button_text">Cancel</string>
+
+    <!-- End Alert Dialog -->
+
 </resources>

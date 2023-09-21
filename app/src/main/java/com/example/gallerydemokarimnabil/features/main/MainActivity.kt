@@ -1,75 +1,147 @@
 package com.example.gallerydemokarimnabil.features.main
 
-import android.content.ContentUris
-import android.graphics.drawable.Drawable
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
+import android.os.StrictMode
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.gallerydemokarimnabil.NavGraphDirections
 import com.example.gallerydemokarimnabil.R
+import com.example.gallerydemokarimnabil.core.Utils
+import com.example.gallerydemokarimnabil.core.interfaces.GalleryStartDestination
 import com.example.gallerydemokarimnabil.databinding.ActivityMainBinding
+import com.example.gallerydemokarimnabil.features.main.viewmodel.MainActivityViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.InputStream
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
+    private lateinit var navHostFragment: NavHostFragment
+    private val mainActivityViewModel by viewModels<MainActivityViewModel>()
+    private lateinit var galleryStartDestination: GalleryStartDestination
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
+        initStrictPolicy()
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setScreenViewsToGone()
-        imagesLiveData = MutableLiveData()
 
-        initNavController()
+        initNavComponents()
+        setAppStartDestination()
         setBottomNavViewItemsClickListeners()
-
-        /*imagesLiveData.observe(this){
-            Log.i("MainActivity", "list's size -> ${it.size}")
-        }*/
 
         // Register the permission result callback
         val requestPermissionLauncher = onPermissionResult()
 
-        permissionsHandler =
-            MediaPermissionsHandler
-                .Builder(application)
-                .readExternalStorage()
-                .writeExternalStorage()
-                .activityResultLauncher(requestPermissionLauncher)
-                .build()
 
-        if(permissionsHandler.isReadExternalStoragePermissionGranted()){
-            setScreenViewsToVisible()
-            //loadImages()
+        // Checking permissions based on the android versions
+        when{
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.P -> {
+                permissionsHandler =
+                    MediaPermissionsHandler
+                        .Builder(application)
+                        .readExternalStorage()
+                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .onPermissionsGranted(
+                            arrayOf(
+                                galleryStartDestination::invokeWhenPermissionsGranted,
+                                this::setScreenViewsToVisible
+                            )
+                        )
+                        .activityResultLauncher(requestPermissionLauncher)
+                        .build()
+
+
+                if(permissionsHandler.arePermissionsGranted()){
+                    setScreenViewsToVisible()
+                }else{
+                    permissionsHandler.requestPermissions()
+                }
+
+            }
+
+            else -> {
+
+                permissionsHandler =
+                    MediaPermissionsHandler
+                        .Builder(application)
+                        .readExternalStorage()
+                        .writeExternalStorage()
+                        .readMediaImages()
+                        .readMediaVideos()
+                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .onPermissionsGranted(
+                            arrayOf(
+                                galleryStartDestination::invokeWhenPermissionsGranted,
+                                this::setScreenViewsToVisible
+                            )
+                        )
+                        .activityResultLauncher(requestPermissionLauncher)
+                        .build()
+
+
+                if(permissionsHandler.arePermissionsGranted()){
+                    setScreenViewsToVisible()
+                }else{
+                    permissionsHandler.requestPermissions()
+                }
+
+
+
+            }
         }
-        else{
-            permissionsHandler.requestPermissions()
-        }
+
+
+
+
+
     }
 
-    private fun initNavController(){
-        val navHostFragment =
+    // TODO remove before delivery
+    private fun initStrictPolicy(){
+        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+            .detectDiskReads()
+            .detectDiskWrites()
+            .penaltyLog()
+            .penaltyDeath()
+            .build())
+
+        StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+            .detectLeakedSqlLiteObjects()
+            .detectLeakedClosableObjects()
+            .penaltyLog()
+            .penaltyDeath()
+            .build())
+    }
+
+    private fun initNavComponents(){
+         navHostFragment =
             supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
         navController = navHostFragment.findNavController()
+    }
+
+    private fun setAppStartDestination(){
+        if(mainActivityViewModel.appStartDestination.value != null){
+            galleryStartDestination =
+                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
+        }
+        else{
+            mainActivityViewModel.setAppStartDestination(navHostFragment)
+            galleryStartDestination =
+                mainActivityViewModel.appStartDestination.value as GalleryStartDestination
+        }
     }
 
     private fun setBottomNavViewItemsClickListeners(){
@@ -127,12 +199,12 @@ class MainActivity : AppCompatActivity() {
         binding.bnvGlobal.visibility = View.VISIBLE
     }
 
-    private fun setBottomNavViewVisibilityToGone(){
-        binding.bnvGlobal.visibility = View.GONE
+    private fun permissionRationaleAction(){
+        showPermanentSnackbar()
     }
 
-    private fun showPermissionRationale(){
-        showPermanentSnackbar()
+    private fun noPermissionRationaleAction(){
+        showPermanentSnackbarForDeviceSettings()
     }
 
     private fun showPermanentSnackbar(){
@@ -144,60 +216,58 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun onPermissionResult() : ActivityResultLauncher<Array<String>>{
-        return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
-            if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
-                setScreenViewsToVisible()
-                loadImages()
+    private fun showPermanentSnackbarForDeviceSettings(){
+        Snackbar
+            .make(binding.root,R.string.permanent_snackbar_message_no_rationale,Snackbar.LENGTH_INDEFINITE)
+            .setAction(R.string.permanent_snackbar_button_label_no_rationale){
+                Utils.openDeviceSettings(this)
             }
-            if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == false){
-                if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
-                    setScreenViewsToGone()
-                    showPermissionRationale()
-                }
-                else{
-                    setBottomNavViewVisibilityToGone()
-                    // TODO delegate this functionality to the currently attached fragment to show an error textview
-                }
-            }
-        }
+            .show()
     }
 
-    private suspend fun loadImagesFromInternalStorage(){
-        val images = mutableListOf<Drawable?>()
-        var inputStream: InputStream? = null
-
-        withContext(Dispatchers.IO){
-            val projections = arrayOf(MediaStore.Images.Media._ID)
-            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-            application.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projections,
-                null,
-                null,
-                sortOrder
-            )?.use {
-                val columnId = it.getColumnIndex(MediaStore.Images.Media._ID)
-                while (it.moveToNext()){
-                    val id = it.getLong(columnId)
-                    val contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,id)
-                    inputStream = contentResolver.openInputStream(contentUri)
-                    images.add(Drawable.createFromStream(inputStream,contentUri.toString()))
-                    if(!isActive){
-                        Log.i("MainActivity", "The current coroutine is inactive.")
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun onPermissionResult() : ActivityResultLauncher<Array<String>>{
+        return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
+                if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
+                    /*setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
+                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
+                }
+                else{
+                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
+                        setScreenViewsToGone()
+                        permissionRationaleAction()
+                    }
+                    else{
+                        noPermissionRationaleAction()
                     }
                 }
             }
-            inputStream?.close()
+            else{
+                if(
+                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == true
+                    &&
+                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == true
+                ){
+                    /*setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
+                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
+                }
+                if(
+                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == false
+                    &&
+                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == false
+                ){
+                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
+                        setScreenViewsToGone()
+                        permissionRationaleAction()
+                    }
+                    else{
+                        noPermissionRationaleAction()
+                    }
+                }
+            }
         }
-
-        imagesLiveData.postValue(images)
-    }
-
-    /*
-    * This function is main-safe
-    * */
-    private fun loadImages(){
-        lifecycleScope.launch { loadImagesFromInternalStorage() }
     }
 }

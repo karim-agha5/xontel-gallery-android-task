@@ -1,23 +1,22 @@
 package com.example.gallerydemokarimnabil.features.images.viewmodel
 
-import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gallerydemokarimnabil.features.core.interfaces.mappers.IFromUriCollectionToDrawables
-import com.example.gallerydemokarimnabil.features.core.interfaces.mediastorefetchers.IImageUriFetcher
-import kotlinx.coroutines.Dispatchers
+import com.example.gallerydemokarimnabil.core.interfaces.data.IImageUriRepository
+import com.example.gallerydemokarimnabil.core.interfaces.mappers.IFromUriCollectionToDrawables
+import com.example.gallerydemokarimnabil.features.images.ImagesFetchStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 // TODO inject the class responsible for loading the images' Uris and the mapper
 class ImagesViewModel(
-    private val imageUriFetcher: IImageUriFetcher,
+    private val imageUriRepository: IImageUriRepository,
     private val uriCollectionToDrawablesMapper: IFromUriCollectionToDrawables
     ) : ViewModel() {
 
-    private val _imagesState = MutableStateFlow<List<Drawable?>>(listOf())
+    private val _imagesState = MutableStateFlow<ImagesFetchStatus>(ImagesFetchStatus.Loading)
     val imagesState = _imagesState.asStateFlow()
 
     /*
@@ -31,13 +30,13 @@ class ImagesViewModel(
     }
 
     private suspend fun loadImagesFromInternalStorage(){
-        var images: List<Drawable?>
-
-        withContext(Dispatchers.IO){
-            val urisList = imageUriFetcher.fetchImageUris()
-            images = uriCollectionToDrawablesMapper.fromUrisToDrawables(urisList)
+        imageUriRepository.fetchImageUris()
+            .catch {
+                _imagesState.value = ImagesFetchStatus.Failure(it)
+            }
+            .collect{
+            val images = uriCollectionToDrawablesMapper.fromUrisToDrawables(it)
+            _imagesState.value = ImagesFetchStatus.Success(images)
         }
-
-        _imagesState.value = images
     }
 }
