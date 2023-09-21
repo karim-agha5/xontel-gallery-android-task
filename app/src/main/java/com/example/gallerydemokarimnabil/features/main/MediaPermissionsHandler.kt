@@ -5,14 +5,16 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.gallerydemokarimnabil.core.customexceptions.ActivityResultLauncherMissingException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.ReadExternalStoragePermissionException
 import com.example.gallerydemokarimnabil.features.core.customexceptions.WriteExternalStoragePermissionException
 
-class MediaPermissionsHandler private constructor(private val builder: Builder) {
+class MediaPermissionsHandler private constructor(builder: Builder) {
 
     private var _context: Context? = null
     private var context: Context
@@ -21,6 +23,8 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
 
     private val readExternalStorage: String?
     private val writeExternalStorage: String?
+    private val readMediaImages: String?
+    private val readMediaVideos: String?
     private val onPermissionsGranted: (() -> Unit)?
 
     private var permissionsList = mutableListOf<String>()
@@ -28,16 +32,22 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
     companion object{
         val READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE
         val WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        val READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        val READ_MEDIA_VIDEOS = Manifest.permission.READ_MEDIA_VIDEO
     }
 
     init {
-        _context = builder.application.applicationContext
-        context = _context!!
-        readExternalStorage = builder.readExternalStorage
-        writeExternalStorage = builder.writeExternalStorage
-        onPermissionsGranted = builder.onPermissionsGranted
-        requestPermissionLauncher = builder.requestPermissionLauncher
-        permissionsList = builder.permissionsList
+        _context                    = builder.application.applicationContext
+        context                     = _context!!
+        readExternalStorage         = builder.readExternalStorage
+        writeExternalStorage        = builder.writeExternalStorage
+        readMediaImages             = builder.readMediaImages
+        readMediaVideos             = builder.readMediaVideos
+        onPermissionsGranted        = builder.onPermissionsGranted
+        requestPermissionLauncher   = builder.requestPermissionLauncher
+        permissionsList             = builder.permissionsList
     }
 
 
@@ -77,6 +87,48 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         throw WriteExternalStoragePermissionException()
     }
 
+    fun isReadMediaImagesPermissionGranted() : Boolean{
+        if(readMediaImages != null){
+            return ContextCompat.checkSelfPermission(
+                context,
+                readMediaImages
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+        // TODO throw custom exception -- this one is a placeholder
+        throw ReadExternalStoragePermissionException()
+    }
+
+    fun isReadMediaVideosPermissionGranted() : Boolean{
+        if(readMediaVideos != null){
+            return ContextCompat.checkSelfPermission(
+                context,
+                readMediaVideos
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+        // TODO throw custom exception -- this one is a placeholder
+        throw ReadExternalStoragePermissionException()
+    }
+
+    private fun isPermissionGranted(permission: String) : Boolean{
+        return ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun arePermissionsGranted() : Boolean{
+        var areGranted = true
+
+        for(permission in permissionsList){
+            if(!isPermissionGranted(permission)){
+                areGranted = false
+                break
+            }
+        }
+
+        return areGranted
+    }
+
     // Get the application instance instead of context to make sure you receive an application's context
     // to avoid possible memory leaks.
     class Builder(val application: Application){
@@ -85,6 +137,12 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
             private set
 
         var writeExternalStorage: String? = null
+            private set
+
+        var readMediaImages: String? = null
+            private set
+
+        var readMediaVideos: String? = null
             private set
 
         var requestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
@@ -112,6 +170,26 @@ class MediaPermissionsHandler private constructor(private val builder: Builder) 
         fun writeExternalStorage() = apply {
             writeExternalStorage = MediaPermissionsHandler.WRITE_EXTERNAL_STORAGE
             permissionsList.add(writeExternalStorage!!)
+        }
+
+        /**
+         * Initializes [MediaPermissionsHandler.READ_MEDIA_IMAGES]
+         * @return [Builder]
+         * */
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        fun readMediaImages() = apply {
+            readMediaImages = MediaPermissionsHandler.READ_MEDIA_IMAGES
+            permissionsList.add(readMediaImages!!)
+        }
+
+        /**
+         * Initializes [MediaPermissionsHandler.READ_MEDIA_VIDEOS]
+         * @return [Builder]
+         * */
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        fun readMediaVideos() = apply {
+            readMediaVideos = MediaPermissionsHandler.READ_MEDIA_VIDEOS
+            permissionsList.add(readMediaVideos!!)
         }
 
         /**

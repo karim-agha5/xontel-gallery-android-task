@@ -7,4 +7,6 @@ package com.example.gallerydemokarimnabil.core.interfaces
  * */
 interface GalleryStartDestination {
     fun invokeWhenPermissionsGranted()
+
+    fun arePermissionsGranted() : Boolean
 }

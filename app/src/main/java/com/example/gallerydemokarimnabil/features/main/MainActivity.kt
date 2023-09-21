@@ -2,6 +2,7 @@ package com.example.gallerydemokarimnabil.features.main
 
 import android.content.ContentUris
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -10,6 +11,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -61,22 +64,53 @@ class MainActivity : AppCompatActivity() {
         // Register the permission result callback
         val requestPermissionLauncher = onPermissionResult()
 
-        permissionsHandler =
-            MediaPermissionsHandler
-                .Builder(application)
-                .readExternalStorage()
-                .writeExternalStorage()
-                .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
-                .activityResultLauncher(requestPermissionLauncher)
-                .build()
 
-        if(permissionsHandler.isReadExternalStoragePermissionGranted()){
-            setScreenViewsToVisible()
-            //loadImages()
+        // Checking permissions based on android versions
+        when{
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.P -> {
+                permissionsHandler =
+                    MediaPermissionsHandler
+                        .Builder(application)
+                        .readExternalStorage()
+                        .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .activityResultLauncher(requestPermissionLauncher)
+                        .build()
+
+
+                if(permissionsHandler.arePermissionsGranted()){
+                    setScreenViewsToVisible()
+                }else{
+                    permissionsHandler.requestPermissions()
+                }
+
+            }
+
+            else -> {
+
+                permissionsHandler =
+                    MediaPermissionsHandler
+                        .Builder(application)
+                        .readExternalStorage()
+                        .writeExternalStorage()
+                        .readMediaImages()
+                        .readMediaVideos()
+                        .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .activityResultLauncher(requestPermissionLauncher)
+                        .build()
+
+
+                if(permissionsHandler.arePermissionsGranted()){
+                    setScreenViewsToVisible()
+                }else{
+                    permissionsHandler.requestPermissions()
+                }
+
+
+
+            }
         }
-        else{
-            permissionsHandler.requestPermissions()
-        }
+
+
     }
 
     private fun initNavComponents(){
@@ -178,17 +212,41 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun onPermissionResult() : ActivityResultLauncher<Array<String>>{
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
-            if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
-                setScreenViewsToVisible()
-                permissionsHandler.invokeOnPermissionsGrantedIfProvided()
-                //loadImages()
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
+                if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
+                    setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()
+                    //loadImages()
+                }
+                if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == false){
+                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
+                        setScreenViewsToGone()
+                        showPermissionRationale()
+                    }
+                }
             }
-            if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == false){
-                if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
-                    setScreenViewsToGone()
-                    showPermissionRationale()
+            else{
+                if(
+                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == true
+                    &&
+                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == true
+                ){
+                    setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()
+                    //loadImages()
+                }
+                if(
+                    it[MediaPermissionsHandler.READ_MEDIA_IMAGES] == false
+                    &&
+                    it[MediaPermissionsHandler.READ_MEDIA_VIDEOS] == false
+                ){
+                    if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
+                        setScreenViewsToGone()
+                        showPermissionRationale()
+                    }
                 }
             }
         }
