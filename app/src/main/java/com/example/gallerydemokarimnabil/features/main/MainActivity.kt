@@ -267,4 +267,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        binding.bnvGlobal.menu.findItem(R.id.images).isChecked = true
+    }
 }
