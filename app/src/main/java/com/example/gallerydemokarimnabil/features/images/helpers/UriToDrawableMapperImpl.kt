@@ -42,8 +42,8 @@ class UriToDrawableMapperImpl @Inject constructor(
                 }
                 inputStream = application.contentResolver.openInputStream(uri)
                 drawablesList.add(Drawable.createFromStream(inputStream,uri.toString()))
+                inputStream?.close()
             }
-            inputStream?.close()
         }
 
         return drawablesList.toList()

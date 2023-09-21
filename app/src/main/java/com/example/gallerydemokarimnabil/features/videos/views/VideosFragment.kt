@@ -38,7 +38,7 @@ class VideosFragment : Fragment() {
 
         lifecycleScope.launch {
             // TODO loads videos when config changes -- fix later
-            //videosViewModel.loadVideosThumbnails()
+            videosViewModel.loadVideosThumbnails()
             videosViewModel.videosThumbnailState.collect{
                 setUiState(it)
             }
@@ -63,7 +63,8 @@ class VideosFragment : Fragment() {
                 status.throwable.printStackTrace()
                 displayFailureDialog()
             }
-            else -> {/*Loading case*/videosViewModel.loadVideosThumbnails()}
+            else -> {/*Loading case*/
+            /*videosViewModel.loadVideosThumbnails()*/}
         }
     }
 
