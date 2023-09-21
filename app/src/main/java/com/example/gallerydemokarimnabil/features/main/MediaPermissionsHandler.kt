@@ -26,6 +26,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
     private val readMediaImages: String?
     private val readMediaVideos: String?
     private val onPermissionsGranted: (() -> Unit)?
+    private val onPermissionsGrantedArray: Array<(() -> Unit)>?
 
     private var permissionsList = mutableListOf<String>()
 
@@ -46,6 +47,7 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
         readMediaImages             = builder.readMediaImages
         readMediaVideos             = builder.readMediaVideos
         onPermissionsGranted        = builder.onPermissionsGranted
+        onPermissionsGrantedArray   = builder.onPermissionsGrantedArray
         requestPermissionLauncher   = builder.requestPermissionLauncher
         permissionsList             = builder.permissionsList
     }
@@ -66,6 +68,14 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
     }
 
     fun invokeOnPermissionsGrantedIfProvided() = onPermissionsGranted?.invoke()
+
+    fun invokeMultipleOnPermissionsGrantedIfProvided(){
+        if(onPermissionsGrantedArray != null) {
+            for(func in onPermissionsGrantedArray){
+                func.invoke()
+            }
+        }
+    }
 
     fun isReadExternalStoragePermissionGranted() : Boolean{
         if(readExternalStorage != null){
@@ -151,6 +161,9 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
         var onPermissionsGranted: (() -> Unit)? = null
             private set
 
+        var onPermissionsGrantedArray: Array<(() -> Unit)>? = null
+            private set
+
         var permissionsList = mutableListOf<String>()
             private set
 
@@ -209,6 +222,10 @@ class MediaPermissionsHandler private constructor(builder: Builder) {
          * */
         fun onPermissionsGranted(func: (() -> Unit)?) = apply{
             this.onPermissionsGranted = func
+        }
+
+        fun onPermissionsGranted(funcs: Array<(() -> Unit)>?) = apply{
+            this.onPermissionsGrantedArray = funcs
         }
 
         /**

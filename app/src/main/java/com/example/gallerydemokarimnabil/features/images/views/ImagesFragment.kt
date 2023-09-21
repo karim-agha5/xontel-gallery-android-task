@@ -38,13 +38,6 @@ class ImagesFragment : Fragment(),GalleryStartDestination {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*permissionsHandler =
-            MediaPermissionsHandler
-                .Builder(requireActivity().application)
-                .readExternalStorage()
-                .writeExternalStorage()
-                .onPermissionsGranted(imagesViewModel::loadImages)
-                .build()*/
         initPermissionHandlerAccordingly()
     }
 

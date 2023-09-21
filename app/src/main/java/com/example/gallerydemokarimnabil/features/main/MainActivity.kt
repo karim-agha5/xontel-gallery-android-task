@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private val mainActivityViewModel by viewModels<MainActivityViewModel>()
     private lateinit var galleryStartDestination: GalleryStartDestination
-    private lateinit var imagesLiveData: MutableLiveData<List<Drawable?>>
     private lateinit var permissionsHandler: MediaPermissionsHandler
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -48,31 +47,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setScreenViewsToGone()
-       // imagesLiveData = MutableLiveData()
 
         initNavComponents()
         setAppStartDestination()
         setBottomNavViewItemsClickListeners()
 
-
-
-
-        /*imagesLiveData.observe(this){
-            Log.i("MainActivity", "list's size -> ${it.size}")
-        }*/
-
         // Register the permission result callback
         val requestPermissionLauncher = onPermissionResult()
 
 
-        // Checking permissions based on android versions
+        // Checking permissions based on the android versions
         when{
             Build.VERSION.SDK_INT < Build.VERSION_CODES.P -> {
                 permissionsHandler =
                     MediaPermissionsHandler
                         .Builder(application)
                         .readExternalStorage()
-                        .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .onPermissionsGranted(
+                            arrayOf(
+                                galleryStartDestination::invokeWhenPermissionsGranted,
+                                this::setScreenViewsToVisible
+                            )
+                        )
                         .activityResultLauncher(requestPermissionLauncher)
                         .build()
 
@@ -94,7 +91,13 @@ class MainActivity : AppCompatActivity() {
                         .writeExternalStorage()
                         .readMediaImages()
                         .readMediaVideos()
-                        .onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        //.onPermissionsGranted(galleryStartDestination::invokeWhenPermissionsGranted)
+                        .onPermissionsGranted(
+                            arrayOf(
+                                galleryStartDestination::invokeWhenPermissionsGranted,
+                                this::setScreenViewsToVisible
+                            )
+                        )
                         .activityResultLauncher(requestPermissionLauncher)
                         .build()
 
@@ -129,15 +132,6 @@ class MainActivity : AppCompatActivity() {
             galleryStartDestination =
                 mainActivityViewModel.appStartDestination.value as GalleryStartDestination
         }
-    }
-
-    /*
-    * The current visible fragment has to be the start destination.
-    * */
-    private fun findStartDestination() : Fragment?{
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
-        return navHostFragment.childFragmentManager.getFragments().get(0)
     }
 
     private fun setBottomNavViewItemsClickListeners(){
@@ -195,10 +189,6 @@ class MainActivity : AppCompatActivity() {
         binding.bnvGlobal.visibility = View.VISIBLE
     }
 
-    private fun setBottomNavViewVisibilityToGone(){
-        binding.bnvGlobal.visibility = View.GONE
-    }
-
     private fun showPermissionRationale(){
         showPermanentSnackbar()
     }
@@ -217,11 +207,11 @@ class MainActivity : AppCompatActivity() {
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
                 if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == true){
-                    setScreenViewsToVisible()
-                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()
-                    //loadImages()
+                    /*setScreenViewsToVisible()
+                    permissionsHandler.invokeOnPermissionsGrantedIfProvided()*/
+                    permissionsHandler.invokeMultipleOnPermissionsGrantedIfProvided()
                 }
-                if(it[MediaPermissionsHandler.READ_EXTERNAL_STORAGE] == false){
+                else{
                     if(permissionsHandler.shouldShowRationaleForReadExternalStorage(this)){
                         setScreenViewsToGone()
                         showPermissionRationale()
@@ -252,41 +242,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun loadImagesFromInternalStorage(){
-        val images = mutableListOf<Drawable?>()
-        var inputStream: InputStream? = null
-
-        withContext(Dispatchers.IO){
-            val projections = arrayOf(MediaStore.Images.Media._ID)
-            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-            application.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projections,
-                null,
-                null,
-                sortOrder
-            )?.use {
-                val columnId = it.getColumnIndex(MediaStore.Images.Media._ID)
-                while (it.moveToNext()){
-                    val id = it.getLong(columnId)
-                    val contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,id)
-                    inputStream = contentResolver.openInputStream(contentUri)
-                    images.add(Drawable.createFromStream(inputStream,contentUri.toString()))
-                    if(!isActive){
-                        Log.i("MainActivity", "The current coroutine is inactive.")
-                    }
-                }
-            }
-            inputStream?.close()
-        }
-
-        imagesLiveData.postValue(images)
-    }
-
-    /*
-    * This function is main-safe
-    * */
-    private fun loadImages(){
-        lifecycleScope.launch { loadImagesFromInternalStorage() }
-    }
 }
